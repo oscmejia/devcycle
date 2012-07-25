@@ -7,13 +7,14 @@ Right now, the following comands are supported:
 
 
 ## Instalation
-------
+-----
 One line instaltion witht [npm](http://npmjs.org). 
+
 	[sudo] npm install devcycle -g
 
 
 ## Usage
-------
+-----
 	devcycle [command] [action]
 	
 Commands: 
