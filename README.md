@@ -7,14 +7,14 @@ Right now, the following comands are supported:
 
 
 ## Instalation
------
+
 One line instaltion witht [npm](http://npmjs.org). 
 
 	[sudo] npm install devcycle -g
 
 
 ## Usage
------
+
 	devcycle [command] [action]
 	
 Commands: 
@@ -51,7 +51,7 @@ will look like this:
 ../my-app/snapshots
 
 ## Help
------
+
 Type the following for an overview of the supported arguments.
 		devcycle -h
 
