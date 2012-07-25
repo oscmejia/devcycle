@@ -23,10 +23,10 @@ perform operations on local snapshots. Valid actions are "add" and "list"
 
 This CLI uses as default the following names for your folders:
 
-##  development
-##  testing
-##  production
-##  repository
+*development
+*testing
+*production
+*repository
 
 It's also under the assumtion that you will have all 4 folders under the same 
 folder, for instance if you application's name is "my-app", your folder estructure
