@@ -1,0 +1,422 @@
+#!/usr/bin/env node
+
+var program 	= require('commander');
+var nodefs 		= require('node-fs');
+var colorize 	= require('colorize');
+var cconsole 	= colorize.console;
+var fs 			= require('fs');
+var wrench 		= require('wrench');
+var util 		= require('util');
+var dateFormat 	= require('dateformat');
+
+// variables
+var folderDevelopment 	= "development";
+var folderTesting 		= "testing";
+var folderDeployment 	= "production";
+var folderSnapshots 	= "snapshots";
+
+program
+  .version('0.1.16')
+  
+program
+  .command('init')
+  .description('initialize project configuration')
+  .action(function(){
+		echo('initialize project configuration');
+		init();
+});
+
+program
+  .command('list')
+  .description('list files in the development folder')
+  .action(function(){
+		echo('List files in the development folder');
+		listFiles(folderDevelopment, false);
+});
+
+program
+  .command('stats')
+  .description('count files in each main folder')
+  .action(function(){
+		echo('Count Files in each main folder');
+		
+		listFiles(folderDevelopment, true);
+		listFiles(folderTesting, true);
+		listFiles(folderDeployment, true);
+		listSnapshots(true);
+		
+		terminate(false);
+});
+
+program
+  .command('copyto [action]')
+  .description('copy files between folders. Valid actions are "test" and "prod"')
+  .action(function(to){
+		echo('Copy files between folders');
+		
+		
+		if (action === 'test'){
+			echo('Copy files from #bold[development] to testing');
+			echo('#red[Files in Testing will be overwritten]');
+		}
+		else if (action === 'prod'){
+			echo('Copy files from #bold[testing] to deployment');
+			echo('#red[Files in Development will be overwritten]');
+		}
+		else{
+			echo('No valid action received.');
+			//echo('No valid action received.');
+			
+			terminate(true);
+			return;
+		}
+		
+		// interactive user input
+		program.confirm('continue? ', function(ok){
+			if(ok){
+				if (action === 'test')
+					copyFilesTo(folderTesting);
+				else if (action === 'prod')
+					copyFilesTo(folderDeployment);
+			}
+			else{
+				echo('#red[Operation Aborted by user. Nothing done]');
+				terminate(false);
+			}
+		});
+		
+		//terminate(false);
+});
+
+program
+  .command('snapshot [action]')
+  .description('perform operations on local snapshots. Valid actions are "add" and "list"')
+  .action(function(action){
+		
+		if(action === 'add'){
+			echo('Add current development files to a new local snapshot');
+			addSnapshotEntry();
+			terminate(false);
+		}
+		else if(action === 'list'){
+			echo('list local snapshots');
+			
+			var r = listSnapshots(false);
+			terminate(!r);
+			
+		}
+		else{
+			echo('No valid action received.');
+			terminate(true);
+		}
+});
+
+/*
+program
+  .command('*')
+  .action(function(env){
+    echo('#red[Please especify a valid command. Nothing done]');
+    terminate(true);
+});
+*/
+
+program.parse(process.argv);
+
+
+
+
+
+
+/*
+Main Functions
+*/
+
+function init()
+{
+	/*
+	createConfigurationFile( function(result){
+		echo('Result ' + result);
+	});
+	*/
+	
+	/*
+	program.confirm('continue? ', function(ok){
+		if(ok){
+			
+		}
+		else{
+			
+		}
+	});
+	*/
+	
+	createFolders();
+}
+
+function createFolders()
+{
+	var n = 0;
+	
+	if( folderExists(folderDevelopment) === false ){
+		createFolder(folderDevelopment, function(result){
+			n++;
+	
+			if(result){
+				echo('#green[#bold[Development] Folder Created]');
+			}
+			else{
+				echo('#red[#bold[Development] folder could not be created.]');
+			}
+			
+			if(n === 4) terminate(false);
+		});
+	}
+	else{
+		echo('#yellow[#bold[Development] Folder already exists. Skipped]');
+	}
+	
+	if( folderExists(folderTesting) === false ){
+		createFolder(folderTesting, function(result2){
+			n++;
+	
+			if(result2){
+				echo('#green[#bold[Testing] Folder Created]');
+			}
+			else{
+				echo('#red[#bold[Testing] folder could not be created.]');
+			}
+			
+			if(n === 4) terminate(false);
+		});
+	}
+	else{
+		echo('#yellow[#bold[Testing] Folder already exists. Skipped]');
+	}
+	
+	if( folderExists(folderDeployment) === false ){
+		createFolder(folderDeployment, function(result3){
+			n++;
+	
+			if(result3){
+				echo('#green[#bold[Deployment] Folder Created]');
+			}
+			else{
+				echo('#red[#bold[Deployment] folder could not be created.]');
+			}
+			
+			if(n === 4) terminate(false);
+		})
+	}
+	else{
+		echo('#yellow[#bold[Deployment] Folder already exists. Skipped]');
+	}
+	
+	if( folderExists(folderSnapshots) === false ){
+		createFolder(folderSnapshots, function(result3){
+			n++;
+	
+			if(result3){
+				echo('#green[#bold[Snapshots] Folder Created]');
+			}
+			else{
+				echo('#red[#bold[Snapshots] folder could not be created.]');
+			}
+			
+			if(n === 4) terminate(false);
+		})
+	}
+	else{
+		echo('#yellow[#bold[Snapshots] Folder already exists. Skipped]');
+	}
+}
+
+function createConfigurationFile(callback)
+{
+	var config = {
+		id: 1,
+		lastName: "last name",
+		firstName: "first name"
+	};
+	var text = JSON.stringify(config);
+
+	fs.writeFile("devcycle-config.json", text, function(err) {
+		if(err) {
+			echo('$red['+err+']');
+			callback('error');
+		} else {
+			echo("#green[Configuration file was created]");
+			callback('ok');
+		}
+		
+	}); 
+}
+
+function listFiles(folder, onlyTotals)
+{
+	var r = folderExists(folder);
+	
+	if(r){
+		var fl = wrench.readdirSyncRecursive(folder);
+		echo('Files Found in #green["' + folder + '"]: #bold['+ fl.length + ']');
+		
+		if(onlyTotals === false){
+			for( var i = 0; i < fl.length; i++ ) {
+				echo('- #green["' + fl[i] + '"]');
+			}
+		}
+	}
+	else{
+		// folder does not exist
+		echo('#red[Folder #bold["' + folder + '"] does not exist]');
+		
+	}
+}
+
+function listSnapshots(onlyTotals)
+{
+	if( folderExists(folderSnapshots) ){
+		var fl = fs.readdirSync(folderSnapshots);
+		
+		echo('Snapshots Entries Found: #bold['+ fl.length + ']');
+		
+		if(onlyTotals === false){
+			for( var i = 0; i < fl.length; i++ ) {
+				echo((i+1) + ' #green["' + fl[i] + '"]');
+			}
+		}		
+		
+		return true;
+	}
+	else{
+		echo('#red[#bold[Snapshots] folder does not exist]');
+		return false;
+	}
+}
+
+function copyFilesTo(to)
+{
+	var fl;
+	
+	if(to == folderTesting){
+		
+		var foldersExist = checkSourceDestinationFolders(folderDevelopment, folderTesting);
+		if(foldersExist === false){
+			terminate(true);
+			return;
+		}
+		else{
+			wrench.copyDirSyncRecursive(folderDevelopment, folderTesting);
+			listFiles(folderDevelopment, true);
+			listFiles(folderTesting, true);
+		}
+	}
+	else if(to == folderDeployment){
+	
+		var foldersExist = checkSourceDestinationFolders(folderTesting, folderDeployment);
+		if(foldersExist === false){
+			terminate(true);
+			return;
+		}
+		else{
+			wrench.copyDirSyncRecursive(folderTesting, folderDeployment);
+			listFiles(folderTesting, true);
+			listFiles(folderDeployment, true);
+		}
+
+	}
+	else{
+		echo("#red[Invalid Destinastion folder for copyFiles operation.]");
+		terminate(true);// terminate with error
+		return;
+	}
+	
+	terminate(false);
+}
+
+function addSnapshotEntry()
+{
+	var foldersExist = checkSourceDestinationFolders(folderDevelopment, folderSnapshots);
+	if(foldersExist === false){
+		terminate(true);
+		return;
+	}
+	else{
+	
+		// create folder
+		var now = new Date();
+		var folderName = folderSnapshots + '/' + dateFormat(now, "yyyy-mm-dd 'T' HHMMss");
+		//echo('===>>> ' + folderName);
+	
+		wrench.mkdirSyncRecursive( folderName, 0777);
+		
+		wrench.copyDirSyncRecursive(folderDeployment, folderName);
+		listFiles(folderDeployment, true);
+		listFiles(folderName, true);
+	}
+}
+
+
+/*
+Util Function
+*/
+
+function createFolder(folder, callback)
+{
+	//echo('create folder: ' + folder);
+	nodefs.mkdir(folder, 0777, function (err) {
+  		if(err){
+    		callback(false);
+  		} 
+  		else{
+    		callback(true);
+  		}
+	});
+}
+
+function folderExists(path)
+{
+	try { 
+		var r = fs.statSync(path).isDirectory();
+		//echo('1r: ' + r);
+		return r
+	}
+  	catch(er){ 
+  		//echo('2r: ' + er);
+  		return false 
+  	}
+}
+
+function checkSourceDestinationFolders(source, destination)
+{
+	var foldersExist = true;
+	
+	if( folderExists(source) === false ){
+		echo('#red[#bold['+source+'] folder does not exist]');
+		foldersExist = false;
+	}
+	
+	if( folderExists(destination) === false ){
+		echo('#red[#bold['+destination+'] folder does not exist]');
+		foldersExist = false;
+	}
+
+	return foldersExist;
+}
+
+function echo(msg){
+	if(msg === ''){
+		console.log(' ');
+		return;
+	}
+	cconsole.log('#bold[devcycle]: ' + msg);
+}
+
+function terminate(error){
+	if(error)
+		echo('#red[Error. Task was not completed]');
+	else
+		echo('#blue[Task completed. Exit]');
+	
+	echo('');
+	process.exit();
+}
