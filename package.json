@@ -1,0 +1,32 @@
+{
+  "name"			: "devcycle",
+  "version"			: "0.1.16",
+  "description"		: "devcycle is command line interface that helps to move files from development to testing and testing to production",
+  "url"           	: "http://vowsjs.org",
+  "main"			: "./bin",
+  "bin"           	: { "devcycle": "./bin/devcycle" },
+  "directories"   	: { "test": "./test", "bin": "./bin" },
+  "dependencies"	: {
+						"commander": ">=1.0.0",
+						"node-fs": ">=0.1.4",
+						"colorize": ">=0.1.0",
+						"wrench": ">=1.3.9",
+						"dateformat": "1.0.2-1.2.3"
+				  	  },
+  "scripts"			: {
+						"test": "./bin/devcyle -h"
+  					},
+  "keywords"		: [
+						"CLI",
+						"development",
+						"cylces",
+						"deploy",
+						"testing",
+						"snapshots"
+  						], 
+  "author"			: {
+						"name": "Oscar Mejia",
+						"email": "oscmejia@vovsolutions.com"
+  					  },
+  "license"			: "BSD"
+}
