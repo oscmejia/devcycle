@@ -2,7 +2,7 @@ devcycle
 ========
 
 devcycle is command line interface that helps to move files from development 
-to testing and testing to production
+to testing and testing to production.
 Right now, the following comands are supported:
 
 
@@ -60,5 +60,4 @@ will look like this:
 Type the following for an overview of the supported arguments.
 
 		devcycle -h
-
 

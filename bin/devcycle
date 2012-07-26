@@ -73,7 +73,6 @@ program
 		}
 		else{
 			echo('No valid action received.');
-			//echo('No valid action received.');
 			
 			terminate(true);
 			return;
