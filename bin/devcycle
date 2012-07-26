@@ -16,13 +16,21 @@ var folderDeployment 	= "production";
 var folderSnapshots 	= "snapshots";
 
 program
-  .version('0.1.17')
+  .version('0.1.22')
   
 program
   .command('init')
   .description('initialize project configuration')
   .action(function(){
 		echo('initialize project configuration');
+		init();
+});
+
+program
+  .command('create')
+  .description('create an empty project')
+  .action(function(){
+		echo('create an empty project');
 		init();
 });
 
@@ -51,16 +59,16 @@ program
 program
   .command('copyto [action]')
   .description('copy files between folders. Valid actions are "test" and "prod"')
-  .action(function(to){
+  .action(function(action){
 		echo('Copy files between folders');
 		
 		
 		if (action === 'test'){
-			echo('Copy files from #bold[development] to testing');
+			echo('Copy files from #bold[development] to #bold[testing]');
 			echo('#red[Files in Testing will be overwritten]');
 		}
 		else if (action === 'prod'){
-			echo('Copy files from #bold[testing] to deployment');
+			echo('Copy files from #bold[testing] to #bold[deployment]');
 			echo('#red[Files in Development will be overwritten]');
 		}
 		else{
@@ -345,12 +353,11 @@ function addSnapshotEntry()
 		// create folder
 		var now = new Date();
 		var folderName = folderSnapshots + '/' + dateFormat(now, "yyyy-mm-dd 'T' HHMMss");
-		//echo('===>>> ' + folderName);
-	
+		
 		wrench.mkdirSyncRecursive( folderName, 0777);
 		
-		wrench.copyDirSyncRecursive(folderDeployment, folderName);
-		listFiles(folderDeployment, true);
+		wrench.copyDirSyncRecursive(folderDevelopment, folderName);
+		listFiles(folderDevelopment, true);
 		listFiles(folderName, true);
 	}
 }

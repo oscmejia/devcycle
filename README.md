@@ -19,9 +19,14 @@ One line instaltion witht [npm](http://npmjs.org).
 	
 Commands: 
 
+## create [projectname]
+create an empty project. Provide the name of the project and all files and folders will
+be created.
+
 ## init
-initialize project configuration
-    
+initialize project configuration. Execute this command from within your application's 
+folder. Al required folders and files will be created.
+
 ## list
 list files in the development folder
     
