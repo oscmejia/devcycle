@@ -1,7 +1,7 @@
 devcycle
 ========
 
-devcycle is command line interface that helps to move files from development 
+Devcycle is command line interface that helps to move files from development 
 to testing and testing to production.
 Right now, the following comands are supported:
 
