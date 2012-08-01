@@ -1,6 +1,6 @@
 {
   "name"			: "devcycle",
-  "version"			: "0.1.22",
+  "version"			: "0.1.23",
   "description"		: "devcycle is command line interface that helps to move files from development to testing and testing to production",
   "url"           	: "http://vowsjs.org",
   "main"			: "./bin",
