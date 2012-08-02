@@ -8,7 +8,7 @@ Right now, the following comands are supported:
 
 ## Instalation
 
-One line instaltion witht [npm](http://npmjs.org). 
+One line instaltion with [npm](http://npmjs.org). 
 
 	[sudo] npm install devcycle -g
 
