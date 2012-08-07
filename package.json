@@ -1,6 +1,6 @@
 {
   "name"			: "devcycle",
-  "version"			: "0.1.24",
+  "version"			: "0.1.25",
   "description"		: "devcycle is command line interface that helps to move files from development to testing and testing to production",
   "url"           	: "http://oscar-mejia.com",
   "main"			: "./bin",
@@ -32,5 +32,5 @@
 						"name": "Oscar Mejia",
 						"email": "oscmejia@vovsolutions.com"
   					  },
-  "license"			: "BSD"
+  "license"			: "MIT"
 }
